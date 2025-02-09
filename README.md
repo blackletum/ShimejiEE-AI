@@ -17,9 +17,10 @@ New Features
     - Greeting message
   - Natural and engaging conversations
   - Requires OpenAI API key for chat functionality
-  welcome to use the AI chat function and visit my website wwww.ycamie.com to get your personaized Shimeji
+  welcome to use the AI chat function and visit my website [YCamie](wwww.ycamie.com) to get your personaized Shimeji
 Installation
 -------
+
 
 - macOS:
   - Download the `mac-jre` version
