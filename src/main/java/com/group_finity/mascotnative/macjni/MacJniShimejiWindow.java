@@ -7,6 +7,8 @@ import com.group_finity.mascot.window.TranslucentWindowEvent;
 import com.group_finity.mascot.window.TranslucentWindowEventHandler;
 import com.group_finity.mascotnative.macjni.menu.MacJniPopupUtil;
 
+import javax.swing.*;
+import java.awt.Component;
 import java.awt.Point;
 import java.awt.Rectangle;
 
@@ -29,6 +31,7 @@ class MacJniShimejiWindow implements TranslucentWindow {
     private native long createNativeShimejiWindow();
 
     private final long ptr;
+    private final JPanel dummyPanel;
 
     private MacJniNativeImage currentImage = null;
     private Rectangle lastSetBounds = new Rectangle();
@@ -38,6 +41,8 @@ class MacJniShimejiWindow implements TranslucentWindow {
 
     MacJniShimejiWindow() {
         this.ptr = createNativeShimejiWindow();
+        this.dummyPanel = new JPanel();
+        this.dummyPanel.setOpaque(false);
     }
 
     @Override
@@ -66,6 +71,7 @@ class MacJniShimejiWindow implements TranslucentWindow {
     public void setBounds(Rectangle r) {
         setJavaBoundsForNSWindow(ptr, r.x, r.y, r.width, r.height);
         lastSetBounds = r;
+        dummyPanel.setBounds(r);
     }
 
     @Override
@@ -83,6 +89,11 @@ class MacJniShimejiWindow implements TranslucentWindow {
     public void dispose() {
         setVisible(false);
         disposeShimejiWindow(ptr);
+    }
+
+    @Override
+    public Component asComponent() {
+        return dummyPanel;
     }
 
     //--- native callbacks---//

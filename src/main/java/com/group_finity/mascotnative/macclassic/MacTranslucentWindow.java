@@ -4,6 +4,7 @@ import com.group_finity.mascotnative.shared.BaseTranslucentSwingWindow;
 
 import javax.swing.JPanel;
 import java.awt.Graphics;
+import java.awt.Component;
 
 /**
  * Can't pass mouse clicks through the transparent areas like other platforms
@@ -42,5 +43,10 @@ class MacTranslucentWindow extends BaseTranslucentSwingWindow<MacNativeImage> {
             getContentPane().repaint();
             setImageChanged(false);
         }
+    }
+
+    @Override
+    public Component asComponent() {
+        return this;  // 因为MacTranslucentWindow继承自JWindow
     }
 }

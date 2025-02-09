@@ -6,6 +6,7 @@ target/
 *.iml
 *.ppf
 cmake-build-*/
+langchain4j-example/
 
 # Misc.
 *.class

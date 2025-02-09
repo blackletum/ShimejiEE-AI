@@ -13,6 +13,7 @@
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.main>com.group_finity.mascotapp.ShimejiEE</project.main>
         <project.finalShimejiOut>${project.build.directory}/${project.name}</project.finalShimejiOut>
@@ -29,6 +30,11 @@
             <groupId>org.openjdk.nashorn</groupId>
             <artifactId>nashorn-core</artifactId>
             <version>15.4</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-open-ai</artifactId>
+            <version>1.0.0-beta1</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -106,10 +112,10 @@
             </plugin>
 
             <!--     Run tests       -->
-            <plugin>
+            <!-- <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.3.0</version>
-            </plugin>
+            </plugin> -->
 
             <!--     Compile with header/cli generation      -->
             <plugin>

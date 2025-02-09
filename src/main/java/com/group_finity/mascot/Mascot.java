@@ -12,6 +12,9 @@ import com.group_finity.mascot.window.TranslucentWindow;
 import com.group_finity.mascot.window.TranslucentWindowEvent;
 import com.group_finity.mascot.window.TranslucentWindowEventHandler;
 import com.group_finity.mascot.window.contextmenu.TopLevelMenuRep;
+import com.group_finity.mascot.chat.AIChatService;
+import com.group_finity.mascot.chat.DefaultAIChatService;
+import com.group_finity.mascot.chat.ChatBubbleWindow;
 
 import javax.sound.sampled.Clip;
 import java.awt.Point;
@@ -68,6 +71,9 @@ public class Mascot implements ScriptableMascot {
     private final ImageSetStore imageSetStore;
     private final MascotUiFactory uiFactory;
 
+    private ChatBubbleWindow chatWindow;
+    private AIChatService chatService;
+
     private record EventHandler(Mascot mascot) implements TranslucentWindowEventHandler {
 
         @Override
@@ -115,6 +121,9 @@ public class Mascot implements ScriptableMascot {
         getWindow().setEventHandler(eventHandler);
 
         log.log(Level.INFO, "Created a mascot ({0})", this);
+
+        this.chatService = null;
+        this.chatWindow = null;
     }
 
     public void startDebugUi() {
@@ -200,6 +209,13 @@ public class Mascot implements ScriptableMascot {
 
         if (getManager() != null) {
             getManager().remove(Mascot.this);
+        }
+
+        if (chatService != null) {
+            chatService.close();
+        }
+        if (chatWindow != null) {
+            chatWindow.dispose();
         }
     }
 
@@ -292,5 +308,26 @@ public class Mascot implements ScriptableMascot {
     public boolean isTransientBreedingAllowed() { return prefProvider.isTransientBreedingAllowed(getImageSet()); }
     public boolean isTransformationAllowed() { return prefProvider.isTransformationAllowed(getImageSet()); }
     public boolean isSoundAllowed() { return prefProvider.isSoundAllowed(getImageSet()); }
+
+    public void startChat() {
+        if (chatWindow == null) {
+            if (chatService == null) {
+                chatService = new DefaultAIChatService(getImageSet());
+            }
+            chatWindow = new ChatBubbleWindow(getWindow().asComponent(), chatService);
+        } else {
+            // 如果窗口已存在但不可见，重新加载聊天服务以获取最新配置
+            if (!chatWindow.isVisible()) {
+                chatWindow.reloadChatService();
+            }
+        }
+        chatWindow.showAboveMascot(getAnchor());
+    }
+
+    public void stopChat() {
+        if (chatWindow != null) {
+            chatWindow.setVisible(false);
+        }
+    }
 
 }

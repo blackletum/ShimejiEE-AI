@@ -8,6 +8,7 @@ import com.group_finity.mascotnative.win.jna.User32;
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.WinUser;
 
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
@@ -90,6 +91,11 @@ class WindowsTranslucentWindow extends BaseTranslucentSwingWindow<WindowsNativeI
             GDI32.INSTANCE.SelectObject(memDC, oldBmp);
             GDI32.INSTANCE.DeleteDC(memDC);
         }
+    }
+
+    @Override
+    public Component asComponent() {
+        return this;  // 因为WindowsTranslucentWindow已经是一个JWindow
     }
 
 }

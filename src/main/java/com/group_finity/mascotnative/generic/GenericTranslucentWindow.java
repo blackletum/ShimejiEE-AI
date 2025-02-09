@@ -45,4 +45,9 @@ class GenericTranslucentWindow extends BaseTranslucentSwingWindow<GenericNativeI
         this.repaint();
     }
 
+    @Override
+    public Component asComponent() {
+        return this;  // 因为GenericTranslucentWindow继承自JWindow
+    }
+
 }

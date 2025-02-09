@@ -393,7 +393,9 @@ public final class AppController implements Runnable, MascotPrefProvider, ImageS
             }),
             entry("Dismiss", Mascot::dispose),
             entry("DismissOthers", m -> manager.disposeIf(mascot -> mascot.id != m.id && mascot.getImageSet().equals(m.getImageSet()))),
-            entry("DismissAllOthers", m -> manager.disposeIf(mascot -> mascot.id != m.id))
+            entry("DismissAllOthers", m -> manager.disposeIf(mascot -> mascot.id != m.id)),
+            entry("StartChat", Mascot::startChat),
+            entry("StopChat", Mascot::stopChat)
     );
 
     //----------Menus------------//
@@ -445,6 +447,7 @@ public final class AppController implements Runnable, MascotPrefProvider, ImageS
                 repActionBtn(Tr.tr("FollowCursor"), "FollowCursor", m),
                 repActionBtn(Tr.tr("RestoreWindows"), "RestoreWindows", m),
                 repActionBtn(Tr.tr("RevealStatistics"), "RevealStatistics", m),
+                repActionBtn(Tr.tr("StartChat"), "StartChat", m),
                 MenuItemRep.SEPARATOR,
                 new MenuRep(Tr.tr("SetBehaviour"), createBehaviourMenuItemsFor(m).toArray(new MenuItemRep[0])),
                 MenuItemRep.SEPARATOR,

@@ -119,4 +119,9 @@ public class VirtualWindowPanel extends JPanel implements TranslucentWindow {
             }
         });
     }
+
+    @Override
+    public Component asComponent() {
+        return this;  // 因为VirtualWindowPanel继承自JPanel
+    }
 }
