@@ -1,4 +1,3 @@
-
 ShimejiEE Cross Platform
 ========================
 
@@ -7,6 +6,17 @@ https://github.com/LavenderSnek/ShimejiEE-cross-platform
 The releases aren't updated frequently, [build from source](docs/building.md) for the latest version.
 
 This project is a fork of [Kilkakon's shimeji version](http://kilkakon.com/shimeji) and incorporates the work from [nonowarn's shimeji4mac](https://github.com/nonowarn/shimeji4mac)
+
+New Features
+-------
+- AI Chat Integration
+  - Chat with your Shimeji using AI technology
+  - Customize your Shimeji's:
+    - Name
+    - Personality
+    - Greeting message
+  - Natural and engaging conversations
+  - Requires OpenAI API key for chat functionality
 
 Installation
 -------
@@ -35,6 +45,10 @@ Installation
 Credits
 -------
 
+- YCamie
+  - Added AI chat functionality and character customization
+  - [Homepage](https://www.ycamie.com)
+
 - LavenderSnek
   - macOS maintainer (this fork)
   - [Github page](https://github.com/LavenderSnek/ShimejiEE-cross-platform)
@@ -59,4 +73,4 @@ Credits
 - Group Finity (Original)
   - The original creator(s) of shimeji
   - [Homepage snapshot](https://web.archive.org/web/20140530231026/http://www.group-finity.com/Shimeji/)
-  - [Vector page](https://www.vector.co.jp/soft/winnt/amuse/se476479.html )
+  - [Vector page](https://www.vector.co.jp/soft/winnt/amuse/se476479.html)
