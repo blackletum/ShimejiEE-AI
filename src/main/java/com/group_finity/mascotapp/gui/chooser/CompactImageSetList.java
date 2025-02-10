@@ -1,5 +1,7 @@
 package com.group_finity.mascotapp.gui.chooser;
 
+import com.group_finity.mascot.imageset.ShimejiProgramFolder;
+import com.group_finity.mascotapp.Constants;
 import com.group_finity.mascotapp.gui.Theme;
 
 import javax.swing.BorderFactory;
@@ -8,15 +10,44 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import java.awt.Component;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class CompactImageSetList extends JList<CompactImageSetPreview> {
 
-    CompactImageSetList(DefaultListModel<CompactImageSetPreview> defaultListModel) {
-        super(defaultListModel);
+    public CompactImageSetList(DefaultListModel<CompactImageSetPreview> model) {
+        super(model);
 
         this.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         this.setLayoutOrientation(JList.VERTICAL);
         this.setCellRenderer(new ImageSetRenderer());
+    }
+
+    public void refreshContent() {
+        DefaultListModel<CompactImageSetPreview> model = (DefaultListModel<CompactImageSetPreview>) getModel();
+        model.clear();
+        
+        try {
+            Path imgDir = Constants.JAR_DIR.resolve("img");
+            if (Files.exists(imgDir)) {
+                try (DirectoryStream<Path> stream = Files.newDirectoryStream(imgDir)) {
+                    for (Path entry : stream) {
+                        if (Files.isDirectory(entry)) {
+                            String imgSet = entry.getFileName().toString();
+                            model.addElement(new CompactImageSetPreview(imgSet, 
+                                ShimejiProgramFolder.fromFolder(Constants.JAR_DIR).getIconPathForImageSet(imgSet)));
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        revalidate();
+        repaint();
     }
 
     private static class ImageSetRenderer implements ListCellRenderer<CompactImageSetPreview> {

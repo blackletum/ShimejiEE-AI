@@ -7,6 +7,7 @@ import com.group_finity.mascotapp.gui.Theme;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -17,6 +18,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -29,51 +32,61 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-class CompactChooser {
+public class CompactChooser {
 
-    private final JFrame frame = new JFrame();
-    {
-        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+    private JDialog dialog;
+    private final Consumer<Collection<String>> onSelection;
+    private final Collection<String> currentSelection;
+    private final ShimejiProgramFolder pf;
+    private CompactImageSetList list;
+
+    public CompactChooser(Consumer<Collection<String>> onSelection, Collection<String> currentSelection, ShimejiProgramFolder pf) {
+        this.onSelection = onSelection;
+        this.currentSelection = currentSelection;
+        this.pf = pf;
     }
 
-    private JList<CompactImageSetPreview> imageSetJlist;
+    protected void addCustomButtons(JPanel buttonPanel) {
+        // 现在这个方法不再需要，因为我们已经在上面添加了按钮
+    }
 
-    private final ShimejiProgramFolder programFolder;
-    private final Consumer<Collection<String>> onSelection;
-    private final Collection<String> currentlySelected;
+    protected JDialog getDialog() {
+        return dialog;
+    }
 
-    CompactChooser(Consumer<Collection<String>> onSelection, Collection<String> currentlySelected, ShimejiProgramFolder programFolder) {
-        this.programFolder = programFolder;
-        this.onSelection = onSelection;
-        this.currentlySelected = currentlySelected;
+    protected void refreshList() {
+        if (list != null) {
+            list.refreshContent();
+        }
     }
 
     /**
      * GUI entry point
      */
     public void createGui() {
+        dialog = new JDialog((Frame) null, "Shimeji Image Set Chooser", true);
         SwingUtilities.invokeLater(() -> {
             //Set up data and selections
             try {
                 CompactChooser.this.addDataToUI();
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(frame, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(dialog, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
 
             //Set up the content pane.
-            CompactChooser.this.addContentToPane(frame.getContentPane());
+            CompactChooser.this.addContentToPane(dialog.getContentPane());
 
-            frame.setResizable(true);
+            dialog.setResizable(true);
 
-            frame.pack();
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
-            frame.toFront();
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+            dialog.toFront();
         });
     }
 
     private ArrayList<String> getSelections() {
-        return imageSetJlist.getSelectedValuesList().stream()
+        return list.getSelectedValuesList().stream()
                 .map(Objects::toString)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
@@ -83,25 +96,25 @@ class CompactChooser {
 
         String[] allImageSets;
         try {
-            allImageSets = programFolder.getImageSetNames().toArray(new String[0]);
+            allImageSets = pf.getImageSetNames().toArray(new String[0]);
         } catch (IOException e) {
             throw new IOException("Unable to load imageSets", e);
         }
 
         if (allImageSets.length == 0) {
-            imageSetJlist = new CompactImageSetList(listModel);
+            list = new CompactImageSetList(listModel);
             return;
         }
 
-        Set<String> selected = new HashSet<>(currentlySelected);
+        Set<String> selected = new HashSet<>(currentSelection);
 
         Collection<CompactImageSetPreview> data = new ArrayList<>(allImageSets.length);
         for (String imgSet : allImageSets) {
-            data.add(new CompactImageSetPreview(imgSet, programFolder.getIconPathForImageSet(imgSet)));
+            data.add(new CompactImageSetPreview(imgSet, pf.getIconPathForImageSet(imgSet)));
         }
         listModel.addAll(data);
 
-        imageSetJlist = new CompactImageSetList(listModel);
+        list = new CompactImageSetList(listModel);
 
         var selectedIndices = new ArrayList<Integer>();
 
@@ -112,7 +125,7 @@ class CompactChooser {
         }
 
         // https://stackoverflow.com/questions/960431/
-        imageSetJlist.setSelectedIndices(selectedIndices.stream().mapToInt(i -> i).toArray());
+        list.setSelectedIndices(selectedIndices.stream().mapToInt(i -> i).toArray());
 
     }
 
@@ -122,13 +135,14 @@ class CompactChooser {
         GridBagConstraints constraints = new GridBagConstraints();
 
         //-------scroll view-------//
-        var scPane = new JScrollPane(imageSetJlist);
+        var scPane = new JScrollPane(list);
 
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weighty = 1;
-        constraints.weightx = 2;
+        constraints.weightx = 1;
+        constraints.gridx = 0;
         constraints.gridy = 0;
-        constraints.insets = new Insets(9, 9, 9, 9);
+        constraints.insets = new Insets(9, 9, 9, 0);  // 右边距设为0
 
         scPane.setBorder(BorderFactory.createLineBorder(Theme.PANEL_BORDER));
         scPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -137,27 +151,51 @@ class CompactChooser {
         pane.add(scPane, constraints);
 
         //--------buttons--------//
-        var buttonCancel = new JButton(Tr.tr("Cancel"));
-        buttonCancel.addActionListener(e -> frame.dispose());
+        JPanel buttonPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints buttonConstraints = new GridBagConstraints();
+        buttonConstraints.gridx = 0;
+        buttonConstraints.fill = GridBagConstraints.HORIZONTAL;
+        buttonConstraints.insets = new Insets(0, 0, 5, 0);  // 按钮之间的间距
+        buttonConstraints.weightx = 1.0;
 
-        var buttonOK = new JButton(Tr.tr("UseSelected"));
+        // 添加新Shimeji按钮
+        JButton addNewButton = new JButton("Add New Shimeji");
+        addNewButton.addActionListener(e -> {
+            AddShimejiDialog addDialog = new AddShimejiDialog(dialog);
+            addDialog.setVisible(true);
+            refreshList();
+        });
+        buttonConstraints.gridy = 0;
+        buttonPanel.add(addNewButton, buttonConstraints);
+
+        // 使用选中按钮
+        JButton buttonOK = new JButton(Tr.tr("UseSelected"));
         buttonOK.addActionListener(e -> {
-            frame.dispose();
+            dialog.dispose();
             onSelection.accept(getSelections());
         });
+        buttonConstraints.gridy = 1;
+        buttonPanel.add(buttonOK, buttonConstraints);
 
-        frame.getRootPane().setDefaultButton(buttonOK);
+        // 取消按钮
+        JButton buttonCancel = new JButton(Tr.tr("Cancel"));
+        buttonCancel.addActionListener(e -> dialog.dispose());
+        buttonConstraints.gridy = 2;
+        buttonPanel.add(buttonCancel, buttonConstraints);
 
-        constraints = new GridBagConstraints();//reset
-        var btnsPanel = new JPanel(gbl);
+        // 添加自定义按钮的占位符
+        buttonConstraints.gridy = 3;
+        buttonConstraints.weighty = 1.0;  // 让剩余空间推到底部
+        buttonPanel.add(new JPanel(), buttonConstraints);
 
-        constraints.anchor = GridBagConstraints.EAST;
-        constraints.gridy = 1;
-        constraints.insets = new Insets(0, 9, 9, 9);
-        //constraints.gridx = 1;
-        btnsPanel.add(buttonCancel);
-        btnsPanel.add(buttonOK);
+        // 将按钮面板添加到主面板
+        constraints = new GridBagConstraints();
+        constraints.gridx = 1;
+        constraints.gridy = 0;
+        constraints.fill = GridBagConstraints.VERTICAL;
+        constraints.insets = new Insets(9, 9, 9, 9);
+        pane.add(buttonPanel, constraints);
 
-        pane.add(btnsPanel, constraints);
+        dialog.getRootPane().setDefaultButton(buttonOK);
     }
 }
