@@ -9,15 +9,30 @@ This project is a fork of [Kilkakon's shimeji version](http://kilkakon.com/shime
 
 New Features
 -------
-- AI Chat Integration
-  - Chat with your Shimeji using AI technology
-  - Customize your Shimeji's:
-    - Name
-    - Personality
-    - Greeting message
-  - Natural and engaging conversations
-  - Requires OpenAI API key for chat functionality
-  welcome to use the AI chat function and visit my website [YCamie](http://wwww.ycamie.com) to get your personaized Shimeji
+- Interactive AI Chat
+  - Chat naturally with your Shimeji using AI technology
+  - Control your Shimeji through chat commands (e.g., "please chase the mouse", "can you sit down?")
+  - Configure OpenAI API key in settings for chat functionality
+  
+- Character Customization
+  - Personalize your Shimeji's:
+    - Name and identity
+    - Personality traits and behavior
+    - Greeting messages
+    - Chat style and responses
+  - Access character settings through the chat window
+  
+- Behavior Control
+  - Direct your Shimeji's actions through chat commands
+  - Available behaviors include:
+    - Chasing the mouse
+    - Sitting and standing
+    - Walking and running
+    - And many more!
+  - Natural command recognition for intuitive control
+
+Visit [YCamie](http://www.ycamie.com) to get your personalized Shimeji and explore more features!
+
 Installation
 -------
 
