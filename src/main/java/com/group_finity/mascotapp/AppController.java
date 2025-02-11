@@ -71,8 +71,6 @@ public final class AppController implements Runnable, MascotPrefProvider, ImageS
         System.setProperty("file.encoding", "UTF-8");
         System.setProperty("sun.jnu.encoding", "UTF-8");
         System.setProperty("java.util.PropertyResourceBundle.encoding", "UTF-8");
-        // 添加 AWT 默认编码设置
-        System.setProperty("awt.font.encoding", "UTF-8");
 
         final var logPropsPath = Constants.JAR_DIR.resolve(Path.of("conf","logging.properties"));
         try (var ins = new FileInputStream(logPropsPath.toFile())) {

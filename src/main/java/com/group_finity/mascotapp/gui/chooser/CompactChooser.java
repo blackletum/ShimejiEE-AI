@@ -161,7 +161,7 @@ public class CompactChooser {
         buttonConstraints.weightx = 1.0;
 
         // 添加新Shimeji按钮
-        JButton addNewButton = new JButton("Add New Shimeji");
+        JButton addNewButton = new JButton(Tr.tr("AddNew"));
         addNewButton.addActionListener(e -> {
             AddShimejiDialog addDialog = new AddShimejiDialog(dialog);
             addDialog.setVisible(true);
@@ -171,20 +171,20 @@ public class CompactChooser {
         buttonPanel.add(addNewButton, buttonConstraints);
 
         // 删除选中的Shimeji按钮
-        JButton deleteButton = new JButton("Delete Selected Shimeji");
+        JButton deleteButton = new JButton(Tr.tr("DeleteSelected"));
         deleteButton.addActionListener(e -> {
             var selectedValues = list.getSelectedValuesList();
             if (selectedValues.isEmpty()) {
                 JOptionPane.showMessageDialog(dialog,
-                    "Please select a Shimeji to delete",
-                    "Warning",
+                    Tr.tr("PleaseSelectShimeji"),
+                    Tr.tr("Warning"),
                     JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
             int result = JOptionPane.showConfirmDialog(dialog,
-                "Are you sure you want to delete the selected Shimeji(s)?\nThis cannot be undone!",
-                "Confirm Deletion",
+                Tr.tr("ConfirmDeletion"),
+                Tr.tr("Warning"),
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
 
@@ -195,8 +195,8 @@ public class CompactChooser {
                         deleteDirectory(shimejiFolderPath);
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(dialog,
-                            "Error deleting Shimeji: " + ex.getMessage(),
-                            "Error",
+                            Tr.tr("ErrorDeletingShimeji") + ": " + ex.getMessage(),
+                            Tr.tr("Error"),
                             JOptionPane.ERROR_MESSAGE);
                     }
                 }
