@@ -311,7 +311,8 @@ public final class AppController implements Runnable, MascotPrefProvider, ImageS
         mascot.setLookRight(Math.random() < 0.5);
 
         try {
-            mascot.setBehavior(mascot.getOwnImageSet().getConfiguration().buildBehavior(null, mascot));
+            // 设置初始行为为 Fall，确保 Shimeji 会从屏幕外掉落
+            mascot.setBehavior(mascot.getOwnImageSet().getConfiguration().buildBehavior("Fall", mascot));
             manager.add(mascot);
         } catch (Exception e) {
             log.log(Level.SEVERE, imageSet + " fatal error, can not be started.", e);

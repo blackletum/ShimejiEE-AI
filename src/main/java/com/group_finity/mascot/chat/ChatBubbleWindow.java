@@ -86,9 +86,12 @@ public class ChatBubbleWindow extends JDialog {
         
         // 显示欢迎消息
         if (chatService.isConfigured()) {
-            appendMessage("System", "Chat is ready! Type your message and press Enter to chat.");
+            String shimejName = CharacterConfig.getCharacterName(imageSet);
+            String greeting = CharacterConfig.getGreeting(imageSet);
+            appendMessage(shimejName, greeting != null && !greeting.isEmpty() ? greeting : "Chat is ready! Type your message and press Enter to chat.");
         } else {
-            appendMessage("System", "Please configure your OpenAI API Key in settings to enable chat.");
+            String shimejName = CharacterConfig.getCharacterName(imageSet);
+            appendMessage(shimejName, "Please configure your OpenAI API Key in settings to enable chat.");
         }
     }
     
@@ -155,7 +158,8 @@ public class ChatBubbleWindow extends JDialog {
             }
             chatService = new DefaultAIChatService(mascot.getImageSet(), mascot);
             if (chatService.isConfigured()) {
-                appendMessage("System", "API Key updated successfully!");
+                String shimejName = CharacterConfig.getCharacterName(imageSet);
+                appendMessage(shimejName, "API Key updated successfully!");
             }
         }
     }
@@ -163,6 +167,8 @@ public class ChatBubbleWindow extends JDialog {
     private void showCharacterSettings() {
         CharacterConfig.showConfigDialog(mascot.getImageSet(), () -> {
             // 当保存角色设置后，重新加载聊天服务以应用新的个性设置
+            String shimejName = CharacterConfig.getCharacterName(imageSet);
+            appendMessage(shimejName, "Updating my personality settings...");
             reloadChatService();
         });
     }
@@ -172,7 +178,19 @@ public class ChatBubbleWindow extends JDialog {
             chatService.close();
         }
         chatService = new DefaultAIChatService(mascot.getImageSet(), mascot);
-        appendMessage("System", "Character settings updated successfully!");
+        String shimejName = CharacterConfig.getCharacterName(imageSet);
+        String greeting = CharacterConfig.getGreeting(imageSet);
+        
+        // 显示更新成功消息
+        appendMessage(shimejName, "My personality settings have been updated! Let me introduce myself again...");
+        
+        // 显示新的问候语
+        if (greeting != null && !greeting.isEmpty()) {
+            appendMessage(shimejName, greeting);
+        }
+        
+        // 提示用户可以继续对话
+        appendMessage(shimejName, "You can continue chatting with me now!");
     }
     
     @Override
