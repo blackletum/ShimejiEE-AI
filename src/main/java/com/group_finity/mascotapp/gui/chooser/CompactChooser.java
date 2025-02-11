@@ -24,6 +24,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -168,23 +170,59 @@ public class CompactChooser {
         buttonConstraints.gridy = 0;
         buttonPanel.add(addNewButton, buttonConstraints);
 
+        // 删除选中的Shimeji按钮
+        JButton deleteButton = new JButton("Delete Selected Shimeji");
+        deleteButton.addActionListener(e -> {
+            var selectedValues = list.getSelectedValuesList();
+            if (selectedValues.isEmpty()) {
+                JOptionPane.showMessageDialog(dialog,
+                    "Please select a Shimeji to delete",
+                    "Warning",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int result = JOptionPane.showConfirmDialog(dialog,
+                "Are you sure you want to delete the selected Shimeji(s)?\nThis cannot be undone!",
+                "Confirm Deletion",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+
+            if (result == JOptionPane.YES_OPTION) {
+                for (var item : selectedValues) {
+                    try {
+                        Path shimejiFolderPath = pf.imgPath().resolve(item.toString());
+                        deleteDirectory(shimejiFolderPath);
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(dialog,
+                            "Error deleting Shimeji: " + ex.getMessage(),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+                refreshList();
+            }
+        });
+        buttonConstraints.gridy = 1;
+        buttonPanel.add(deleteButton, buttonConstraints);
+
         // 使用选中按钮
         JButton buttonOK = new JButton(Tr.tr("UseSelected"));
         buttonOK.addActionListener(e -> {
             dialog.dispose();
             onSelection.accept(getSelections());
         });
-        buttonConstraints.gridy = 1;
+        buttonConstraints.gridy = 2;
         buttonPanel.add(buttonOK, buttonConstraints);
 
         // 取消按钮
         JButton buttonCancel = new JButton(Tr.tr("Cancel"));
         buttonCancel.addActionListener(e -> dialog.dispose());
-        buttonConstraints.gridy = 2;
+        buttonConstraints.gridy = 3;
         buttonPanel.add(buttonCancel, buttonConstraints);
 
         // 添加自定义按钮的占位符
-        buttonConstraints.gridy = 3;
+        buttonConstraints.gridy = 4;
         buttonConstraints.weighty = 1.0;  // 让剩余空间推到底部
         buttonPanel.add(new JPanel(), buttonConstraints);
 
@@ -197,5 +235,19 @@ public class CompactChooser {
         pane.add(buttonPanel, constraints);
 
         dialog.getRootPane().setDefaultButton(buttonOK);
+    }
+
+    private void deleteDirectory(Path path) throws IOException {
+        if (Files.exists(path)) {
+            Files.walk(path)
+                .sorted(java.util.Comparator.reverseOrder())
+                .forEach(p -> {
+                    try {
+                        Files.delete(p);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+        }
     }
 }

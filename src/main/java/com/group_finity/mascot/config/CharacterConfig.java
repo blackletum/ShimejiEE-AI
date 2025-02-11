@@ -1,6 +1,7 @@
 package com.group_finity.mascot.config;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.Properties;
 import java.util.logging.*;
@@ -16,21 +17,20 @@ public class CharacterConfig {
         Properties props = new Properties();
         
         try {
-            // 使用 Constants.JAR_DIR 构建路径
             Path configPath = Constants.JAR_DIR.resolve("img").resolve(imageSet).resolve("character.properties");
             
             log.info("Loading properties for imageSet: " + imageSet);
             log.info("Trying to load from path: " + configPath.toAbsolutePath());
             
-            // 如果文件不存在，创建默认配置
             if (!Files.exists(configPath)) {
                 log.info("File does not exist, creating default config");
                 createDefaultConfig(configPath);
             }
             
-            // 加载配置
-            try (InputStream in = Files.newInputStream(configPath)) {
-                props.load(in);
+            // 使用 UTF-8 编码读取文件
+            try (InputStreamReader reader = new InputStreamReader(
+                    Files.newInputStream(configPath), StandardCharsets.UTF_8)) {
+                props.load(reader);
                 log.info("Loaded properties: " + props);
             }
             
@@ -48,8 +48,10 @@ public class CharacterConfig {
         defaults.setProperty("personality", DEFAULT_PERSONALITY);
         defaults.setProperty("greeting", DEFAULT_GREETING);
         
-        try (OutputStream out = Files.newOutputStream(configPath)) {
-            defaults.store(out, "Character configuration (UTF-8 encoding)");
+        // 使用 UTF-8 编码写入文件
+        try (OutputStreamWriter writer = new OutputStreamWriter(
+                Files.newOutputStream(configPath), StandardCharsets.UTF_8)) {
+            defaults.store(writer, "Character configuration (UTF-8 encoding)");
         }
     }
     
@@ -62,8 +64,10 @@ public class CharacterConfig {
             
             Path configPath = Constants.JAR_DIR.resolve("img").resolve(imageSet).resolve("character.properties");
             
-            try (OutputStream out = Files.newOutputStream(configPath)) {
-                props.store(out, "Character configuration (UTF-8 encoding)");
+            // 使用 UTF-8 编码写入文件
+            try (OutputStreamWriter writer = new OutputStreamWriter(
+                    Files.newOutputStream(configPath), StandardCharsets.UTF_8)) {
+                props.store(writer, "Character configuration (UTF-8 encoding)");
                 log.info("Saved character properties to: " + configPath);
             }
         } catch (IOException e) {

@@ -6,6 +6,7 @@ import java.awt.*;
 import java.io.*;
 import java.nio.file.*;
 import java.util.Properties;
+import java.nio.charset.StandardCharsets;
 
 public class AddShimejiDialog extends JDialog {
     private final JTextField nameField;
@@ -112,8 +113,10 @@ public class AddShimejiDialog extends JDialog {
                     props.setProperty("personality", "a cute and friendly desktop companion");
                     props.setProperty("greeting", "Hello! How can I help you today?");
                     
-                    try (OutputStream out = Files.newOutputStream(characterProps)) {
-                        props.store(out, "Character configuration (UTF-8 encoding)");
+                    // 使用 UTF-8 编码写入文件
+                    try (OutputStreamWriter writer = new OutputStreamWriter(
+                            Files.newOutputStream(characterProps), StandardCharsets.UTF_8)) {
+                        props.store(writer, "Character configuration (UTF-8 encoding)");
                     }
                 }
                 

@@ -67,7 +67,12 @@ public final class AppController implements Runnable, MascotPrefProvider, ImageS
     private static final Path SETTINGS_PATH;
 
     static {
+        // 确保 Properties 文件使用 UTF-8 编码
+        System.setProperty("file.encoding", "UTF-8");
+        System.setProperty("sun.jnu.encoding", "UTF-8");
         System.setProperty("java.util.PropertyResourceBundle.encoding", "UTF-8");
+        // 添加 AWT 默认编码设置
+        System.setProperty("awt.font.encoding", "UTF-8");
 
         final var logPropsPath = Constants.JAR_DIR.resolve(Path.of("conf","logging.properties"));
         try (var ins = new FileInputStream(logPropsPath.toFile())) {
@@ -466,13 +471,13 @@ public final class AppController implements Runnable, MascotPrefProvider, ImageS
     //---Tray Menu
 
     private MenuItem awtActionBtn(String title, String action) {
-        final MenuItem btn = new MenuItem(title);
+        final MenuItem btn = new MenuItem(new String(title.getBytes(java.nio.charset.StandardCharsets.UTF_8), java.nio.charset.StandardCharsets.UTF_8));
         btn.addActionListener(e -> mainMenuActions.get(action).run());
         return btn;
     }
 
     private CheckboxMenuItem awtToggle(String text, BooleanSupplier getter, Consumer<Boolean> setter) {
-        final var toggleBtn = new CheckboxMenuItem(text, getter.getAsBoolean());
+        final var toggleBtn = new CheckboxMenuItem(new String(text.getBytes(java.nio.charset.StandardCharsets.UTF_8), java.nio.charset.StandardCharsets.UTF_8), getter.getAsBoolean());
         toggleBtn.addItemListener(e -> {
             setter.accept(!getter.getAsBoolean());
             toggleBtn.setState(getter.getAsBoolean());
@@ -493,9 +498,9 @@ public final class AppController implements Runnable, MascotPrefProvider, ImageS
         }
 
         //--languages submenu
-        final Menu languageMenu = new Menu(Tr.tr("Language"));
+        final Menu languageMenu = new Menu(new String(Tr.tr("Language").getBytes(java.nio.charset.StandardCharsets.UTF_8), java.nio.charset.StandardCharsets.UTF_8));
         for (String[] lang : Constants.LANGUAGE_TABLE) {
-            final var langName = lang[0];
+            final var langName = new String(lang[0].getBytes(java.nio.charset.StandardCharsets.UTF_8), java.nio.charset.StandardCharsets.UTF_8);
             final var locale = Locale.forLanguageTag(lang[1]);
             final var langBtn = new MenuItem(langName);
             langBtn.addActionListener(e -> setLocale(locale));
@@ -503,7 +508,7 @@ public final class AppController implements Runnable, MascotPrefProvider, ImageS
         }
 
         //--scaling submenu
-        final Menu scalingMenu = new Menu(Tr.tr("Scaling"));
+        final Menu scalingMenu = new Menu(new String(Tr.tr("Scaling").getBytes(java.nio.charset.StandardCharsets.UTF_8), java.nio.charset.StandardCharsets.UTF_8));
         final double scalingStep = 0.25;
         final int scalesCount = 16;
         for (int i = 1; i <= scalesCount; i++) {
@@ -526,7 +531,7 @@ public final class AppController implements Runnable, MascotPrefProvider, ImageS
         }
 
         //--behaviour toggles submenu
-        final Menu bvTogglesMenu = new Menu(Tr.tr("AllowedBehaviours"));
+        final Menu bvTogglesMenu = new Menu(new String(Tr.tr("AllowedBehaviours").getBytes(java.nio.charset.StandardCharsets.UTF_8), java.nio.charset.StandardCharsets.UTF_8));
 
         bvTogglesMenu.add(awtToggle(Tr.tr("BreedingCloning"), this::isBreedingAllowed, this::setBreedingAllowed));
         bvTogglesMenu.add(awtToggle(Tr.tr("BreedingTransient"), this::isTransientBreedingAllowed, this::setTransientBreedingAllowed));
@@ -538,9 +543,9 @@ public final class AppController implements Runnable, MascotPrefProvider, ImageS
         bvTogglesMenu.add(awtToggle(Tr.tr("IgnoreImagesetProperties"), this::shouldIgnoreImagesetProperties, this::setShouldIgnoreImagesetProperties));
 
         //--image set toggles
-        final Menu imgTogglesMenu = new Menu(Tr.tr("ImageSet"));
+        final Menu imgTogglesMenu = new Menu(new String(Tr.tr("ImageSet").getBytes(java.nio.charset.StandardCharsets.UTF_8), java.nio.charset.StandardCharsets.UTF_8));
 
-        var rl = new MenuItem(Tr.tr("NeedsReload"));
+        var rl = new MenuItem(new String(Tr.tr("NeedsReload").getBytes(java.nio.charset.StandardCharsets.UTF_8), java.nio.charset.StandardCharsets.UTF_8));
         rl.setEnabled(false);
         imgTogglesMenu.add(rl);
 
