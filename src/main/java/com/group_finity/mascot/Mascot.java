@@ -17,8 +17,10 @@ import com.group_finity.mascot.chat.DefaultAIChatService;
 import com.group_finity.mascot.chat.ChatBubbleWindow;
 
 import javax.sound.sampled.Clip;
+import javax.swing.SwingUtilities;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Window;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -310,17 +312,7 @@ public class Mascot implements ScriptableMascot {
     public boolean isSoundAllowed() { return prefProvider.isSoundAllowed(getImageSet()); }
 
     public void startChat() {
-        if (chatWindow == null) {
-            if (chatService == null) {
-                chatService = new DefaultAIChatService(getImageSet());
-            }
-            chatWindow = new ChatBubbleWindow(getWindow().asComponent(), chatService);
-        } else {
-            // 如果窗口已存在但不可见，重新加载聊天服务以获取最新配置
-            if (!chatWindow.isVisible()) {
-                chatWindow.reloadChatService();
-            }
-        }
+        initChatWindow();
         chatWindow.showAboveMascot(getAnchor());
     }
 
@@ -330,4 +322,10 @@ public class Mascot implements ScriptableMascot {
         }
     }
 
+    private void initChatWindow() {
+        if (chatWindow == null) {
+            Window owner = SwingUtilities.getWindowAncestor(getWindow().asComponent());
+            chatWindow = new ChatBubbleWindow(owner, this);
+        }
+    }
 }

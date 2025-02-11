@@ -10,6 +10,8 @@ public class ApiKeyConfigDialog extends JDialog {
     private static final String PREF_API_KEY = "openai.api.key";
     private final JTextField apiKeyField;
     private final Preferences prefs;
+    private boolean apiKeyUpdated = false;
+    private String originalKey;
     
     public ApiKeyConfigDialog(Window owner) {
         super(owner, "OpenAI API Configuration", ModalityType.APPLICATION_MODAL);
@@ -39,8 +41,8 @@ public class ApiKeyConfigDialog extends JDialog {
         mainPanel.add(apiKeyLabel, gbc);
         
         apiKeyField = new JPasswordField(40);
-        String savedKey = prefs.get(PREF_API_KEY, "");
-        apiKeyField.setText(savedKey);
+        originalKey = prefs.get(PREF_API_KEY, "");
+        apiKeyField.setText(originalKey);
         gbc.gridx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
@@ -53,10 +55,13 @@ public class ApiKeyConfigDialog extends JDialog {
         
         saveButton.addActionListener(e -> {
             String apiKey = apiKeyField.getText().trim();
-            if (!apiKey.isEmpty()) {
-                prefs.put(PREF_API_KEY, apiKey);
-            } else {
-                prefs.remove(PREF_API_KEY);
+            if (!apiKey.equals(originalKey)) {
+                if (!apiKey.isEmpty()) {
+                    prefs.put(PREF_API_KEY, apiKey);
+                } else {
+                    prefs.remove(PREF_API_KEY);
+                }
+                apiKeyUpdated = true;
             }
             dispose();
         });
@@ -77,4 +82,8 @@ public class ApiKeyConfigDialog extends JDialog {
         Preferences prefs = Preferences.userNodeForPackage(DefaultAIChatService.class);
         return prefs.get(PREF_API_KEY, null);
     }
-} 
+    
+    public boolean isApiKeyUpdated() {
+        return apiKeyUpdated;
+    }
+}
