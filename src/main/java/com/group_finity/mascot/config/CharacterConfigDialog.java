@@ -1,7 +1,12 @@
 package com.group_finity.mascot.config;
 
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.ui.FlatRoundBorder;
+import com.formdev.flatlaf.ui.FlatButtonBorder;
 import com.group_finity.mascotapp.Constants;
+
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.*;
 import java.nio.file.*;
@@ -19,7 +24,16 @@ public class CharacterConfigDialog extends JDialog {
         this.imageSet = imageSet;
         this.onSaveCallback = onSaveCallback;
         
-        setLayout(new BorderLayout(10, 10));
+        // 设置 FlatLaf 主题
+        FlatLightLaf.setup();
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception ex) {
+            System.err.println("Failed to initialize FlatLaf");
+        }
+        
+        // 设置窗口属性
+        setResizable(false);
         
         // 加载当前配置
         Properties props = new Properties();
@@ -34,70 +48,110 @@ public class CharacterConfigDialog extends JDialog {
             e.printStackTrace();
         }
         
+        // 创建主面板
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
+        mainPanel.setBackground(UIManager.getColor("Panel.background"));
+        
+        // 创建标题面板
+        JPanel titlePanel = new JPanel(new BorderLayout());
+        titlePanel.setOpaque(false);
+        JLabel titleLabel = new JLabel("Character Settings");
+        titleLabel.setFont(new Font("Dialog", Font.BOLD, 16));
+        titleLabel.setBorder(new EmptyBorder(0, 0, 10, 0));
+        titlePanel.add(titleLabel, BorderLayout.WEST);
+        
         // 创建表单面板
         JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(4, 4, 4, 4);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         
         // 名称
-        nameField = new JTextField(30);
+        JLabel nameLabel = new JLabel("Name:");
+        nameLabel.setFont(new Font("Dialog", Font.BOLD, 12));
+        nameField = new JTextField(25);
         nameField.setText(props.getProperty("name", "Shimeji"));
+        nameField.setBorder(new FlatRoundBorder());
+        nameField.setFont(new Font("Dialog", Font.PLAIN, 12));
+        
         gbc.gridx = 0; gbc.gridy = 0;
-        formPanel.add(new JLabel("Name:"), gbc);
+        formPanel.add(nameLabel, gbc);
         gbc.gridx = 1;
+        gbc.weightx = 1.0;
         formPanel.add(nameField, gbc);
         
         // 个性描述
-        personalityArea = new JTextArea(5, 30);
+        JLabel personalityLabel = new JLabel("Personality:");
+        personalityLabel.setFont(new Font("Dialog", Font.BOLD, 12));
+        personalityArea = new JTextArea(4, 25);
         personalityArea.setText(props.getProperty("personality", ""));
         personalityArea.setLineWrap(true);
         personalityArea.setWrapStyleWord(true);
+        personalityArea.setFont(new Font("Dialog", Font.PLAIN, 12));
+        JScrollPane scrollPane = new JScrollPane(personalityArea);
+        scrollPane.setBorder(new FlatRoundBorder());
+        
         gbc.gridx = 0; gbc.gridy = 1;
-        formPanel.add(new JLabel("Personality:"), gbc);
+        gbc.weightx = 0;
+        gbc.insets = new Insets(8, 4, 4, 4);
+        formPanel.add(personalityLabel, gbc);
         gbc.gridx = 1;
-        formPanel.add(new JScrollPane(personalityArea), gbc);
+        gbc.weightx = 1.0;
+        formPanel.add(scrollPane, gbc);
         
         // 欢迎语
-        greetingField = new JTextField(30);
+        JLabel greetingLabel = new JLabel("Greeting:");
+        greetingLabel.setFont(new Font("Dialog", Font.BOLD, 12));
+        greetingField = new JTextField(25);
         greetingField.setText(props.getProperty("greeting", ""));
+        greetingField.setBorder(new FlatRoundBorder());
+        greetingField.setFont(new Font("Dialog", Font.PLAIN, 12));
+        
         gbc.gridx = 0; gbc.gridy = 2;
-        formPanel.add(new JLabel("Greeting:"), gbc);
+        gbc.weightx = 0;
+        gbc.insets = new Insets(4, 4, 4, 4);
+        formPanel.add(greetingLabel, gbc);
         gbc.gridx = 1;
+        gbc.weightx = 1.0;
         formPanel.add(greetingField, gbc);
         
         // 按钮面板
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        buttonPanel.setOpaque(false);
+        buttonPanel.setBorder(new EmptyBorder(10, 0, 0, 0));
+        
         JButton saveButton = new JButton("Save");
+        saveButton.setFont(new Font("Dialog", Font.PLAIN, 12));
+        saveButton.setBorder(new FlatButtonBorder());
+        
         JButton cancelButton = new JButton("Cancel");
+        cancelButton.setFont(new Font("Dialog", Font.PLAIN, 12));
+        cancelButton.setBorder(new FlatButtonBorder());
         
         saveButton.addActionListener(e -> {
             try {
-                // 保存配置
                 String name = nameField.getText().trim();
                 String personality = personalityArea.getText().trim();
                 String greeting = greetingField.getText().trim();
                 
-                // 使用 CharacterConfig 来保存配置
                 CharacterConfig.saveCharacterConfig(imageSet, name, personality, greeting);
                 
-                // 显示保存成功提示
                 JOptionPane.showMessageDialog(
                     this,
-                    "Character settings saved successfully!\nThe changes will take effect immediately.",
+                    "Character settings saved successfully!",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE
                 );
                 
-                // 如果有回调，执行回调来更新聊天窗口
                 if (onSaveCallback != null) {
                     onSaveCallback.run();
                 }
                 
                 dispose();
             } catch (Exception ex) {
-                // 显示错误信息
                 JOptionPane.showMessageDialog(
                     this,
                     "Failed to save character settings:\n" + ex.getMessage(),
@@ -113,15 +167,12 @@ public class CharacterConfigDialog extends JDialog {
         buttonPanel.add(saveButton);
         buttonPanel.add(cancelButton);
         
-        // 添加到主面板
-        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        // 组装主面板
+        mainPanel.add(titlePanel, BorderLayout.NORTH);
         mainPanel.add(formPanel, BorderLayout.CENTER);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
         
-        add(mainPanel);
-        
-        // 设置对话框属性
+        setContentPane(mainPanel);
         pack();
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);

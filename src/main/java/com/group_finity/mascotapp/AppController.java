@@ -66,6 +66,8 @@ public final class AppController implements Runnable, MascotPrefProvider, ImageS
 
     private static final Path SETTINGS_PATH;
 
+    private boolean useGenericMode = true;
+
     static {
         // 确保 Properties 文件使用 UTF-8 编码
         System.setProperty("file.encoding", "UTF-8");
@@ -107,7 +109,7 @@ public final class AppController implements Runnable, MascotPrefProvider, ImageS
         }
     }
 
-    @Override public boolean isBreedingAllowed() {return userSwitches.getOrDefault("Breeding", true);}
+    @Override public boolean isBreedingAllowed() {return userSwitches.getOrDefault("Breeding", false);}
     private void setBreedingAllowed(boolean allowed) {userSwitches.put("Breeding", allowed);}
 
     @Override public boolean isTransientBreedingAllowed() {return userSwitches.getOrDefault("Transients", true);}
@@ -145,7 +147,10 @@ public final class AppController implements Runnable, MascotPrefProvider, ImageS
     public void run() {
         try {
             // init native (needs to be before everything else)
-            final String nativeProp = System.getProperty("com.group_finity.mascotnative", Constants.NATIVE_PKG_DEFAULT);
+            String nativeProp = System.getProperty("com.group_finity.mascotnative", Constants.NATIVE_PKG_DEFAULT);
+            if (isUsingGenericMode()) {
+                nativeProp = "generic";
+            }
             NativeFactory.init(nativeProp, Constants.NATIVE_LIB_DIR);
             NativeFactory.getInstance().getEnvironment().init();
 
@@ -561,6 +566,7 @@ public final class AppController implements Runnable, MascotPrefProvider, ImageS
         final PopupMenu trayPopup = new PopupMenu();
 
         trayPopup.add(awtActionBtn(Tr.tr("CallShimeji"), "CallShimeji"));
+        trayPopup.add(awtToggle("Use Generic Mode (Restart Required)", this::isUsingGenericMode, this::setUseGenericMode));
         trayPopup.add(awtActionBtn(Tr.tr("FollowCursor"), "FollowCursor"));
         trayPopup.add(awtActionBtn(Tr.tr("ReduceToOne"), "ReduceToOne"));
         trayPopup.add(awtActionBtn(Tr.tr("RestoreWindows"), "RestoreWindows"));
@@ -607,6 +613,15 @@ public final class AppController implements Runnable, MascotPrefProvider, ImageS
             log.log(Level.SEVERE, "Failed to create tray menu", e);
             System.exit(1);
         }
+    }
+
+    private boolean isUsingGenericMode() {return userSwitches.getOrDefault("UseGenericMode", false);}
+    private void setUseGenericMode(boolean enabled) {
+        userSwitches.put("UseGenericMode", enabled);
+        JOptionPane.showMessageDialog(frame,
+            "Generic mode " + (enabled ? "enabled" : "disabled") + ".\nPlease restart Shimeji for the changes to take effect.",
+            "Restart Required",
+            JOptionPane.INFORMATION_MESSAGE);
     }
 
 }

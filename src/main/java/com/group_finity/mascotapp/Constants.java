@@ -51,7 +51,8 @@ public class Constants {
             "Sounds",
             "TranslateBehaviorNames",
             "AlwaysShowShimejiChooser",
-            "IgnoreImagesetProperties"
+            "IgnoreImagesetProperties",
+            "UseGenericMode"
     };
 
     //--- image set settings

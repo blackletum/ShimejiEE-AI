@@ -2,6 +2,10 @@ package com.group_finity.mascot.chat;
 
 import com.group_finity.mascot.Mascot;
 import com.group_finity.mascot.config.CharacterConfig;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.ui.FlatButtonBorder;
+import com.formdev.flatlaf.ui.FlatRoundBorder;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -24,54 +28,87 @@ public class ChatBubbleWindow extends JDialog {
         super(owner);
         this.mascot = mascot;
         this.imageSet = mascot.getImageSet();
+        
+        // 设置 FlatLaf 主题
+        FlatLightLaf.setup();
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception ex) {
+            System.err.println("Failed to initialize FlatLaf");
+        }
+        
         setUndecorated(true);
         setAlwaysOnTop(true);
+        
+        // 创建主面板，使用圆角边框
+        JPanel mainPanel = new JPanel(new BorderLayout(5, 5));
+        mainPanel.setBorder(new FlatRoundBorder());
+        mainPanel.setBackground(UIManager.getColor("Panel.background"));
         
         // 创建聊天区域
         chatArea = new JTextArea(10, 30);
         chatArea.setEditable(false);
         chatArea.setLineWrap(true);
         chatArea.setWrapStyleWord(true);
+        chatArea.setFont(new Font("Dialog", Font.PLAIN, 14));
+        chatArea.setBackground(UIManager.getColor("TextArea.background"));
         
         // 创建滚动面板
         JScrollPane scrollPane = new JScrollPane(chatArea);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        scrollPane.setBackground(UIManager.getColor("ScrollPane.background"));
         
         // 创建输入框
         inputField = new JTextField(30);
         inputField.addActionListener(e -> sendMessage());
-        
-        // 创建发送按钮
-        sendButton = new JButton("发送");
-        sendButton.addActionListener(e -> sendMessage());
-        
-        // 创建设置按钮
-        settingsButton = new JButton("⚙");
-        settingsButton.addActionListener(e -> showSettings());
-        
-        // 创建角色设置按钮
-        JButton characterButton = new JButton("👤");
-        characterButton.addActionListener(e -> showCharacterSettings());
-        
-        // 创建关闭按钮
-        JButton closeButton = new JButton("×");
-        closeButton.addActionListener(e -> dispose());
+        inputField.setFont(new Font("Dialog", Font.PLAIN, 14));
+        inputField.setBorder(new FlatRoundBorder());
         
         // 创建按钮面板
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
-        buttonPanel.add(characterButton);
-        buttonPanel.add(settingsButton);
-        buttonPanel.add(closeButton);
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+        buttonPanel.setOpaque(false);
+        
+        // 创建标题标签
+        titleLabel = new JLabel(CharacterConfig.getCharacterName(imageSet));
+        titleLabel.setFont(new Font("Dialog", Font.BOLD, 14));
+        titleLabel.setBorder(new EmptyBorder(5, 10, 5, 0));
+        
+        // 创建按钮
+        settingsButton = createIconButton("⚙", "Settings");
+        JButton characterButton = createIconButton("👤", "Character Settings");
+        JButton closeButton = createIconButton("×", "Close");
+        
+        // 设置按钮事件
+        settingsButton.addActionListener(e -> showSettings());
+        characterButton.addActionListener(e -> showCharacterSettings());
+        closeButton.addActionListener(e -> dispose());
+        
+        // 创建顶部面板
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setOpaque(false);
+        topPanel.add(titleLabel, BorderLayout.WEST);
+        
+        JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+        controlPanel.setOpaque(false);
+        controlPanel.add(characterButton);
+        controlPanel.add(settingsButton);
+        controlPanel.add(closeButton);
+        topPanel.add(controlPanel, BorderLayout.EAST);
+        
+        // 创建发送按钮
+        sendButton = new JButton("Send");
+        sendButton.addActionListener(e -> sendMessage());
+        sendButton.setBorder(new FlatButtonBorder());
         
         // 创建输入面板
         JPanel inputPanel = new JPanel(new BorderLayout(5, 0));
+        inputPanel.setOpaque(false);
+        inputPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         inputPanel.add(inputField, BorderLayout.CENTER);
         inputPanel.add(sendButton, BorderLayout.EAST);
         
-        // 设置主面板
-        JPanel mainPanel = new JPanel(new BorderLayout(5, 5));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        mainPanel.add(buttonPanel, BorderLayout.NORTH);
+        // 组装主面板
+        mainPanel.add(topPanel, BorderLayout.NORTH);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.add(inputPanel, BorderLayout.SOUTH);
         
@@ -80,6 +117,10 @@ public class ChatBubbleWindow extends JDialog {
         
         setContentPane(mainPanel);
         pack();
+        
+        // 设置窗口样式
+        setBackground(new Color(255, 255, 255, 240));
+        getRootPane().setWindowDecorationStyle(JRootPane.NONE);
         
         // 初始化聊天服务
         chatService = new DefaultAIChatService(mascot.getImageSet(), mascot);
@@ -93,6 +134,16 @@ public class ChatBubbleWindow extends JDialog {
             String shimejName = CharacterConfig.getCharacterName(imageSet);
             appendMessage(shimejName, "Please configure your OpenAI API Key in settings to enable chat.");
         }
+    }
+    
+    private JButton createIconButton(String text, String tooltip) {
+        JButton button = new JButton(text);
+        button.setToolTipText(tooltip);
+        button.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        button.setFocusPainted(false);
+        button.setContentAreaFilled(false);
+        button.setFont(new Font("Dialog", Font.PLAIN, 16));
+        return button;
     }
     
     private void addDragSupport(JPanel panel) {

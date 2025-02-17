@@ -1,5 +1,9 @@
 package com.group_finity.mascot.chat;
 
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.ui.FlatRoundBorder;
+import com.formdev.flatlaf.ui.FlatButtonBorder;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -17,41 +21,60 @@ public class ApiKeyConfigDialog extends JDialog {
         super(owner, "OpenAI API Configuration", ModalityType.APPLICATION_MODAL);
         this.prefs = Preferences.userNodeForPackage(DefaultAIChatService.class);
         
-        setLayout(new BorderLayout(10, 10));
+        // 设置 FlatLaf 主题
+        FlatLightLaf.setup();
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception ex) {
+            System.err.println("Failed to initialize FlatLaf");
+        }
+        
+        // 设置窗口属性
+        setResizable(false);
         
         // 创建主面板
-        JPanel mainPanel = new JPanel(new GridBagLayout());
-        mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        JPanel mainPanel = new JPanel(new BorderLayout(8, 8));
+        mainPanel.setBorder(new EmptyBorder(12, 12, 12, 12));
+        mainPanel.setBackground(UIManager.getColor("Panel.background"));
+        
+        // 创建内容面板
+        JPanel contentPanel = new JPanel(new GridBagLayout());
+        contentPanel.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(4, 0, 4, 0);
         
         // API Key 说明
-        JLabel infoLabel = new JLabel("<html>Please enter your OpenAI API Key.<br/>You can get it from: https://platform.openai.com/api-keys</html>");
+        JLabel infoLabel = new JLabel("Please enter your OpenAI API Key:");
+        infoLabel.setFont(new Font("Dialog", Font.PLAIN, 12));
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(0, 0, 10, 0);
-        mainPanel.add(infoLabel, gbc);
+        contentPanel.add(infoLabel, gbc);
         
         // API Key 输入框
-        JLabel apiKeyLabel = new JLabel("API Key:");
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.insets = new Insets(0, 0, 5, 5);
-        mainPanel.add(apiKeyLabel, gbc);
-        
-        apiKeyField = new JPasswordField(40);
+        apiKeyField = new JPasswordField(25);
         originalKey = prefs.get(PREF_API_KEY, "");
         apiKeyField.setText(originalKey);
-        gbc.gridx = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
-        mainPanel.add(apiKeyField, gbc);
+        apiKeyField.setBorder(new FlatRoundBorder());
+        apiKeyField.setFont(new Font("Dialog", Font.PLAIN, 12));
+        gbc.gridy = 1;
+        gbc.insets = new Insets(8, 0, 12, 0);
+        contentPanel.add(apiKeyField, gbc);
         
         // 按钮面板
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        buttonPanel.setOpaque(false);
+        
+        // 保存按钮
         JButton saveButton = new JButton("Save");
+        saveButton.setFont(new Font("Dialog", Font.PLAIN, 12));
+        saveButton.setBorder(new FlatButtonBorder());
+        
+        // 取消按钮
         JButton cancelButton = new JButton("Cancel");
+        cancelButton.setFont(new Font("Dialog", Font.PLAIN, 12));
+        cancelButton.setBorder(new FlatButtonBorder());
         
         saveButton.addActionListener(e -> {
             String apiKey = apiKeyField.getText().trim();
@@ -71,9 +94,11 @@ public class ApiKeyConfigDialog extends JDialog {
         buttonPanel.add(saveButton);
         buttonPanel.add(cancelButton);
         
-        add(mainPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+        // 组装主面板
+        mainPanel.add(contentPanel, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
         
+        setContentPane(mainPanel);
         pack();
         setLocationRelativeTo(owner);
     }
