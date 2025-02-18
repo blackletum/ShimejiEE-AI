@@ -272,14 +272,14 @@ public class ChatBubbleWindow extends JDialog {
         StyledDocument doc = chatArea.getStyledDocument();
         
         if (sender.equals("You")) {
-            // 用户消息保持不变
+            // 用户消息靠右对齐，使用普通样式
             SimpleAttributeSet style = new SimpleAttributeSet();
             StyleConstants.setAlignment(style, StyleConstants.ALIGN_RIGHT);
             
             try {
-                doc.insertString(doc.getLength(), message + "\n", style);
-                doc.setParagraphAttributes(doc.getLength() - message.length() - 1, 
-                                         message.length() + 1, style, false);
+                doc.insertString(doc.getLength(), message + "\n\n", style);  // 添加两个换行
+                doc.setParagraphAttributes(doc.getLength() - message.length() - 2, 
+                                         message.length() + 2, style, false);
             } catch (BadLocationException e) {
                 e.printStackTrace();
             }
@@ -349,12 +349,12 @@ public class ChatBubbleWindow extends JDialog {
                     pos++;
                 }
                 
-                // 添加换行
+                // 添加两个换行来增加间距
                 doc.insertString(doc.getLength(), "\n\n", baseStyle);
                 
                 // 设置整个段落的对齐方式
-                doc.setParagraphAttributes(doc.getLength() - message.length() - sender.length() - 3,
-                                         message.length() + sender.length() + 3, baseStyle, false);
+                doc.setParagraphAttributes(doc.getLength() - message.length() - sender.length() - 4,
+                                         message.length() + sender.length() + 4, baseStyle, false);
             } catch (BadLocationException e) {
                 e.printStackTrace();
             }
