@@ -69,10 +69,10 @@ public final class AppController implements Runnable, MascotPrefProvider, ImageS
     private boolean useGenericMode = true;
 
     static {
-        // 确保 Properties 文件使用 UTF-8 编码
-        System.setProperty("file.encoding", "UTF-8");
-        System.setProperty("sun.jnu.encoding", "UTF-8");
-        System.setProperty("java.util.PropertyResourceBundle.encoding", "UTF-8");
+        // // 确保 Properties 文件使用 UTF-8 编码
+        // System.setProperty("file.encoding", "UTF-8");
+        // System.setProperty("sun.jnu.encoding", "UTF-8");
+        // System.setProperty("java.util.PropertyResourceBundle.encoding", "UTF-8");
 
         final var logPropsPath = Constants.JAR_DIR.resolve(Path.of("conf","logging.properties"));
         try (var ins = new FileInputStream(logPropsPath.toFile())) {

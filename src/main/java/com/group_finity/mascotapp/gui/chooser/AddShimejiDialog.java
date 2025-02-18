@@ -115,7 +115,7 @@ public class AddShimejiDialog extends JDialog {
                     
                     // 使用 UTF-8 编码写入文件
                     try (OutputStreamWriter writer = new OutputStreamWriter(
-                            Files.newOutputStream(characterProps), StandardCharsets.UTF_8)) {
+                            Files.newOutputStream(characterProps))) {
                         props.store(writer, "Character configuration (UTF-8 encoding)");
                     }
                 }

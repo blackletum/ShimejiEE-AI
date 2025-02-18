@@ -29,7 +29,7 @@ public class CharacterConfig {
             
             // 使用 UTF-8 编码读取文件
             try (InputStreamReader reader = new InputStreamReader(
-                    Files.newInputStream(configPath), StandardCharsets.UTF_8)) {
+                    Files.newInputStream(configPath))) {
                 props.load(reader);
                 log.info("Loaded properties: " + props);
             }
@@ -50,7 +50,7 @@ public class CharacterConfig {
         
         // 使用 UTF-8 编码写入文件
         try (OutputStreamWriter writer = new OutputStreamWriter(
-                Files.newOutputStream(configPath), StandardCharsets.UTF_8)) {
+                Files.newOutputStream(configPath))) {
             defaults.store(writer, "Character configuration (UTF-8 encoding)");
         }
     }
@@ -66,7 +66,7 @@ public class CharacterConfig {
             
             // 使用 UTF-8 编码写入文件
             try (OutputStreamWriter writer = new OutputStreamWriter(
-                    Files.newOutputStream(configPath), StandardCharsets.UTF_8)) {
+                    Files.newOutputStream(configPath))) {
                 props.store(writer, "Character configuration (UTF-8 encoding)");
                 log.info("Saved character properties to: " + configPath);
             }
