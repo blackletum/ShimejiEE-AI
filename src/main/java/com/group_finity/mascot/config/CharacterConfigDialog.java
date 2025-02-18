@@ -11,6 +11,7 @@ import java.awt.*;
 import java.io.*;
 import java.nio.file.*;
 import java.util.Properties;
+import java.nio.charset.StandardCharsets;
 
 public class CharacterConfigDialog extends JDialog {
     private final JTextField nameField;
@@ -40,8 +41,9 @@ public class CharacterConfigDialog extends JDialog {
         try {
             Path configPath = Constants.JAR_DIR.resolve("img").resolve(imageSet).resolve("character.properties");
             if (Files.exists(configPath)) {
-                try (InputStream in = Files.newInputStream(configPath)) {
-                    props.load(in);
+                try (InputStreamReader reader = new InputStreamReader(
+                        Files.newInputStream(configPath), StandardCharsets.UTF_8)) {
+                    props.load(reader);
                 }
             }
         } catch (IOException e) {
