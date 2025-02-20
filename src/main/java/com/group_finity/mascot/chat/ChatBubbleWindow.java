@@ -270,20 +270,29 @@ public class ChatBubbleWindow extends JDialog {
     
     private void appendMessage(String sender, String message) {
         StyledDocument doc = chatArea.getStyledDocument();
-        
         if (sender.equals("You")) {
-            // 用户消息靠右对齐，使用普通样式
+            // User message right-aligned with normal style
             SimpleAttributeSet style = new SimpleAttributeSet();
             StyleConstants.setAlignment(style, StyleConstants.ALIGN_RIGHT);
             
             try {
-                doc.insertString(doc.getLength(), message + "\n\n", style);  // 添加两个换行
-                doc.setParagraphAttributes(doc.getLength() - message.length() - 2, 
-                                         message.length() + 2, style, false);
+                // First apply the alignment to the current position
+                doc.setParagraphAttributes(doc.getLength(), 1, style, false);
+                
+                // Then insert the text
+                doc.insertString(doc.getLength(), message + "\n\n", null);
+                
+                // Apply alignment to the entire paragraph
+                int startOffset = doc.getLength() - message.length() - 2;
+                int length = message.length() + 2;
+                doc.setParagraphAttributes(startOffset, length, style, true);
+                
+                // Ensure the next paragraph is also right-aligned
+                doc.setParagraphAttributes(doc.getLength(), 1, style, false);
             } catch (BadLocationException e) {
                 e.printStackTrace();
             }
-        } else {
+        }else {
             // Shimeji消息处理
             SimpleAttributeSet baseStyle = new SimpleAttributeSet();
             StyleConstants.setAlignment(baseStyle, StyleConstants.ALIGN_LEFT);
