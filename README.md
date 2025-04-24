@@ -1,3 +1,11 @@
+Despite my best efforts, this isn't working as intended. I will be taking this repository and making it archived.
+
+Instead of this project, I'd recommend to check this one out instead, which took basically my "idea" and made it 500x better before I even attempted this at all:
+
+https://github.com/pixelomer/Shijima-Qt
+
+
+
 ShimejiEE Cross Platform
 ========================
 
